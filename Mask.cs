@@ -21,156 +21,122 @@ using System.Text;
 
 namespace MatrixEffect
 {
-  /// <summary>
-  /// 
-  /// </summary>
-  [Flags]
-  public enum ColorComponent
-  {
-    None = 0,
-    A = 0x01,
-    R = 0x02,
-    G = 0x04,
-    B = 0x08,
-    RGB = R | G | B,
-    ARGB = A | R | G | B
-  }
-  /// <summary>
-  /// 
-  /// </summary>
-  public class Mask : ICloneable
-  {
-    #region Members
-    private double[,] m_data;
-    private int m_colOffset;
-    private int m_rowOffset;
-    private ColorComponent m_componemts = ColorComponent.RGB;
-    #endregion
+    /// <summary>
+    /// 
+    /// </summary>
+    [Flags]
+    public enum ColorComponent
+    {
+        None = 0,
+        A = 0x01,
+        R = 0x02,
+        G = 0x04,
+        B = 0x08,
+        RGB = R | G | B,
+        ARGB = A | R | G | B
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Mask : ICloneable
+    {
+        #region Members
+        private double[,] m_data;
+        #endregion
 
-    #region Properties
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns></returns>
-    public double this[int x, int y]
-    {
-      get
-      {
-        return m_data[x, y];
-      }
-      set
-      {
-        m_data[x, y] = value;
-      }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public int Columns
-    {
-      get
-      {
-        return m_data.GetLength(0);
-      }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public int Rows
-    {
-      get
-      {
-        return m_data.GetLength(1);
-      }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public int ColumnOffset
-    {
-      get { return m_colOffset; }
-      set { m_colOffset = value; }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public int RowsOffset
-    {
-      get { return m_rowOffset; }
-      set { m_rowOffset = value; }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public double Sum
-    {
-      get
-      {
-        double s = 0;
-
-        for (int i = 0; i < this.Columns; i++)
+        #region Properties
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public double this[int x, int y]
         {
-          for (int j = 0; j < this.Rows; j++)
-          {
-            s += m_data[i, j];
-          }
+            get => m_data[x, y];
+            set => m_data[x, y] = value;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Columns => m_data.GetLength(0);
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Rows => m_data.GetLength(1);
+        /// <summary>
+        /// 
+        /// </summary>
+        public int ColumnOffset { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public int RowsOffset { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public double Sum
+        {
+            get
+            {
+                double s = 0;
 
-        return s;
-      }
+                for (int i = 0; i < Columns; i++)
+                {
+                    for (int j = 0; j < Rows; j++)
+                    {
+                        s += m_data[i, j];
+                    }
+                }
+
+                return s;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public ColorComponent Components { get; set; } = ColorComponent.RGB;
+        #endregion
+
+        #region Constructor
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cols"></param>
+        /// <param name="rows"></param>
+        public Mask(int cols, int rows)
+        {
+            ColumnOffset = cols / 2;
+            RowsOffset = rows / 2;
+
+            m_data = new double[cols, rows];
+            m_data[ColumnOffset, RowsOffset] = 1d;
+        }
+        #endregion
+
+        #region Implementation
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        object ICloneable.Clone()
+        {
+            return this.Clone();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Mask Clone()
+        {
+            return new Mask(this.Columns, this.Rows)
+            {
+                RowsOffset = RowsOffset,
+                ColumnOffset = ColumnOffset,
+                m_data = m_data.Clone() as double[,],
+                Components = Components
+            };
+        }
+        #endregion
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    public ColorComponent Components
-    {
-      get { return m_componemts; }
-      set { m_componemts = value; }
-    }
-    #endregion
-
-    #region Constructor
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="cols"></param>
-    /// <param name="rows"></param>
-    public Mask(int cols, int rows)
-    {
-      m_data = new double[cols, rows];
-      m_colOffset = cols / 2;
-      m_rowOffset = rows / 2;
-
-      m_data[m_colOffset, m_rowOffset] = 1d;
-    }
-    #endregion
-
-    #region Implementation
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    object ICloneable.Clone()
-    {
-      return this.Clone();
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public Mask Clone()
-    {
-      Mask mask = new Mask(this.Columns, this.Rows);
-
-      mask.m_rowOffset = m_rowOffset;
-      mask.m_colOffset = m_colOffset;
-      mask.m_data = m_data.Clone() as double[,];
-      mask.m_componemts = m_componemts;
-
-      return mask;
-    }
-    #endregion
-  }
 }

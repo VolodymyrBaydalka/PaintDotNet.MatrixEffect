@@ -21,22 +21,17 @@ using System.Text;
 
 namespace MatrixEffect
 {
-  /// <summary>
-  /// 
-  /// </summary>
-  static class Masks
-  {
-    #region Properties
     /// <summary>
     /// 
     /// </summary>
-    public static Mask None
+    static class Masks
     {
-      get
-      {
-        return null;
-      }
+        #region Properties
+        /// <summary>
+        /// 
+        /// </summary>
+        public static Mask None => null;
+        public static Mask EmptyMask3x3 => new Mask(3, 3);
+        #endregion
     }
-    #endregion
-  }
 }

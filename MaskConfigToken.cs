@@ -15,6 +15,7 @@
  * limitations under the License.
  *******************************************************************************/
 #endregion
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,37 +23,27 @@ using PaintDotNet.Effects;
 
 namespace MatrixEffect
 {
-  public class MaskConfigToken : EffectConfigToken
-  {
-    #region Members
-    private Mask m_mask = new Mask(3, 3);
-    #endregion
-
-    #region Properties
-    /// <summary>
-    /// 
-    /// </summary>
-    public Mask Mask
+    public class MaskConfigToken : EffectConfigToken
     {
-      get { return m_mask; }
-      set 
-      { 
-        m_mask = value; 
-      }
-    }
-    #endregion
+        #region Properties
+        /// <summary>
+        /// 
+        /// </summary>
+        public Mask Mask { get; set; } = new Mask(3, 3);
+        #endregion
 
-    #region Implementation
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public override object Clone()
-    {
-      MaskConfigToken mct = new MaskConfigToken();
-      mct.Mask = this.Mask.Clone();
-      return mct;
+        #region Implementation
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override object Clone()
+        {
+            return new MaskConfigToken
+            {
+                Mask = Mask.Clone()
+            };
+        }
+        #endregion
     }
-    #endregion
-  }
 }
