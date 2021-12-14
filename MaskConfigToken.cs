@@ -16,9 +16,6 @@
  *******************************************************************************/
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using PaintDotNet.Effects;
 
 namespace MatrixEffect

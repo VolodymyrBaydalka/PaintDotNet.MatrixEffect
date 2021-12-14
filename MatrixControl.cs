@@ -16,139 +16,103 @@
  *******************************************************************************/
 #endregion
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
-using System.Drawing;
 using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace MatrixEffect
 {
-  /// <summary>
-  /// 
-  /// </summary>
-  class MatrixControl : Control
-  {
-    #region Constants
-    private const int c_textBoxWidth = 60;
-    private const int c_textBoxHeight = 20;
-    #endregion
-
-    #region Events
-    public event EventHandler MartixChanged;
-    #endregion
-
-    #region Members
-    private int m_columnsCount;
-    private int m_rowsCount;
-    #endregion
-
-    #region Properties
     /// <summary>
     /// 
     /// </summary>
-    public int ColumnsCourt
+    public class MatrixControl : Control
     {
-      get { return m_columnsCount; }
-      set { m_columnsCount = value; }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public int RowsCout
-    {
-      get { return m_rowsCount; }
-      set { m_rowsCount = value; }
-    }
-    #endregion
+        #region Constants
+        private static readonly Size textBoxSize = new Size(60, 20);
+        #endregion
 
-    #region Public methods
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="i"></param>
-    /// <param name="j"></param>
-    /// <param name="text"></param>
-    public void SetText( int i, int j, string text)
-    {
-      (this.Controls[i + j * m_columnsCount] as TextBox).Text = text;
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="i"></param>
-    /// <param name="j"></param>
-    /// <returns></returns>
-    public string GetText(int i, int j)
-    {
-      return (this.Controls[i + j * m_columnsCount] as TextBox).Text;
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    public override void Refresh()
-    {
-      this.Controls.Clear();
+        #region Events
+        public event EventHandler MartixChanged;
+        #endregion
 
-      this.Size = new Size(m_columnsCount * c_textBoxWidth, m_rowsCount * c_textBoxHeight);
+        #region Properties
+        public int ColumnsCount { get; set; }
+        public int RowsCount { get; set; }
+        #endregion
 
-      for (int j = 0; j < m_rowsCount; j++)
-      {
-        for (int i = 0; i < m_columnsCount; i++)
+        #region Public methods
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <param name="text"></param>
+        public void SetText(int i, int j, string text)
         {
-          TextBox textbox = new TextBox();
-
-          textbox.Text = "0";
-          textbox.Size = new Size(c_textBoxWidth, c_textBoxHeight);
-          textbox.Location = new Point(i * c_textBoxWidth, j * c_textBoxHeight);
-          textbox.Validating += new System.ComponentModel.CancelEventHandler(OnTextboxValidating);
-          textbox.Validated += new EventHandler(OnTextboxValidated);
-
-          this.Controls.Add(textbox);
+            (this.Controls[i + j * ColumnsCount] as TextBox).Text = text;
         }
-      }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <returns></returns>
+        public string GetText(int i, int j)
+        {
+            return (this.Controls[i + j * ColumnsCount] as TextBox).Text;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Refresh()
+        {
+            this.Controls.Clear();
 
-      base.Refresh();
-    }
-    #endregion
+            this.Size = new Size(ColumnsCount * textBoxSize.Width, RowsCount * textBoxSize.Height);
 
-    #region Implementation
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OnTextboxValidated(object sender, EventArgs e)
-    {
-      RaiseMartixChanged(this, e);
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OnTextboxValidating(object sender, CancelEventArgs e)
-    {
-      double tempResult = double.NaN;
-      TextBox textBox = sender as TextBox;
+            for (int j = 0; j < RowsCount; j++)
+            {
+                for (int i = 0; i < ColumnsCount; i++)
+                {
+                    TextBox textbox = new TextBox
+                    {
+                        Text = "0",
+                        Size = textBoxSize,
+                        Location = new Point(i * textBoxSize.Width, j * textBoxSize.Height)
+                    };
+                    textbox.Validating += OnTextboxValidating;
+                    textbox.Validated += OnTextboxValidated;
 
-      if (textBox != null)
-      {
-        e.Cancel = !double.TryParse(textBox.Text, out tempResult);
-      }
+                    this.Controls.Add(textbox);
+                }
+            }
+
+            base.Refresh();
+        }
+        #endregion
+
+        #region Implementation
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTextboxValidated(object sender, EventArgs e)
+        {
+            MartixChanged?.Invoke(sender, e);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTextboxValidating(object sender, CancelEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                e.Cancel = !double.TryParse(textBox.Text, out var _);
+            }
+        }
+        #endregion
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
-    private void RaiseMartixChanged(object sender, EventArgs args)
-    {
-      if (MartixChanged != null)
-      {
-        MartixChanged(sender, args);
-      }
-    }
-    #endregion
-  }
 }
